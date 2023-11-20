@@ -7,7 +7,6 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/Attsun1031/gqlgen-extension-usagerecorder/usagerecorder/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -18,7 +17,7 @@ func TestGraphqlUsageRecorder_CollectGraphqlUsage(t *testing.T) {
 	cases := map[string]struct {
 		inputOperationContext  *graphql.OperationContext
 		complexity             *extension.ComplexityStats
-		expectedReferenceTypes map[string][]*model.ReferenceType
+		expectedReferenceTypes map[string][]*ReferenceType
 		expectedServiceName    string
 	}{
 		"valid": {
@@ -42,7 +41,7 @@ func TestGraphqlUsageRecorder_CollectGraphqlUsage(t *testing.T) {
 				},
 				Stats: graphql.Stats{OperationStart: now},
 			},
-			expectedReferenceTypes: map[string][]*model.ReferenceType{
+			expectedReferenceTypes: map[string][]*ReferenceType{
 				"byId": {
 					{
 						TypeName: "byId",

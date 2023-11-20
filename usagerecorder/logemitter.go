@@ -5,8 +5,6 @@ import (
 	"log/slog"
 	"math/rand"
 	"time"
-
-	"github.com/Attsun1031/gqlgen-extension-usagerecorder/usagerecorder/model"
 )
 
 type LogEmitter struct {
@@ -30,7 +28,7 @@ func NewLogEmitter(logger *slog.Logger, samplingRate int) *LogEmitter {
 	}
 }
 
-func (x *LogEmitter) Emit(usage *model.GraphqlUsage) error {
+func (x *LogEmitter) Emit(usage *GraphqlUsage) error {
 	if !x.Sampling() {
 		return nil
 	}

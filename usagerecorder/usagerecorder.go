@@ -9,7 +9,6 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/Attsun1031/gqlgen-extension-usagerecorder/usagerecorder/model"
 )
 
 // GraphqlUsageRecorder records usages of graphql API calls. That is used to investigate API usages.
@@ -127,7 +126,7 @@ func (g *GraphqlUsageRecorder) InterceptResponse(ctx context.Context, next graph
 	return next(ctx)
 }
 
-func (g *GraphqlUsageRecorder) CollectGraphqlUsage(ctx context.Context, oc *graphql.OperationContext) *model.GraphqlUsage {
+func (g *GraphqlUsageRecorder) CollectGraphqlUsage(ctx context.Context, oc *graphql.OperationContext) *GraphqlUsage {
 	complexityStats, ok := oc.Stats.GetExtension("ComplexityLimit").(*extension.ComplexityStats)
 	if !ok {
 		g.logger.Warn("failed to cast ComplexityStats")
@@ -139,15 +138,15 @@ func (g *GraphqlUsageRecorder) CollectGraphqlUsage(ctx context.Context, oc *grap
 
 	// extract dependent objects and fields
 	cfs := graphql.CollectFields(oc, oc.Operation.SelectionSet, nil)
-	var queryToReferencedTypes = make(map[string][]*model.ReferenceType, len(cfs))
+	var queryToReferencedTypes = make(map[string][]*ReferenceType, len(cfs))
 	for _, cf := range cfs {
-		refTypes := extractReferenceTypes(oc, cf, make([]*model.ReferenceType, 0))
+		refTypes := extractReferenceTypes(oc, cf, make([]*ReferenceType, 0))
 		queryToReferencedTypes[cf.Name] = refTypes
 	}
 	end := g.clock()
 	duration := end.Sub(oc.Stats.OperationStart)
 
-	usage := &model.GraphqlUsage{
+	usage := &GraphqlUsage{
 		OperationTime:         oc.Stats.OperationStart,
 		QueryOperationName:    oc.Operation.Name,
 		QueryComplexity:       *complexityStats,
@@ -170,7 +169,7 @@ func (g *GraphqlUsageRecorder) GetUserAgent(oc *graphql.OperationContext) string
 	return ua[0]
 }
 
-func extractReferenceTypes(oc *graphql.OperationContext, cf graphql.CollectedField, result []*model.ReferenceType) []*model.ReferenceType {
+func extractReferenceTypes(oc *graphql.OperationContext, cf graphql.CollectedField, result []*ReferenceType) []*ReferenceType {
 	var fieldNames = make([]string, 0)
 	for _, f := range graphql.CollectFields(oc, cf.Selections, nil) {
 		if f.Selections != nil && len(f.Selections) > 0 {
@@ -180,6 +179,6 @@ func extractReferenceTypes(oc *graphql.OperationContext, cf graphql.CollectedFie
 			fieldNames = append(fieldNames, f.Name)
 		}
 	}
-	result = append(result, &model.ReferenceType{TypeName: cf.Name, Fields: fieldNames})
+	result = append(result, &ReferenceType{TypeName: cf.Name, Fields: fieldNames})
 	return result
 }
