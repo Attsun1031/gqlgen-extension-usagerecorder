@@ -1,0 +1,16 @@
+run:
+  timeout: 5m
+linters:
+  disable-all: true
+  enable:
+    # enabled by default
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    # additional linters
+    - goimports
+    - gosec
