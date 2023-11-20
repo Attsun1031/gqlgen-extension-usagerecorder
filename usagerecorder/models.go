@@ -1,4 +1,4 @@
-package model
+package usagerecorder
 
 import (
 	"time"
